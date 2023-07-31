@@ -11,6 +11,10 @@ shift
 mkdir -pv $TARGET
 
 for SRC in $@ ; do
+    if [ ! -e "$SRC" ] ; then
+        echo "$SRC not found"
+        exit 1
+    fi
     if [ -d "$SRC" ] ; then
         if echo $SRC | grep -qE '^/' ; then
             D=$(dirname $SRC)
