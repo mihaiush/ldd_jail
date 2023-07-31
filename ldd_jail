@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [ -z "$2" ] ; then
+    echo $(basename $0) LABEL SRC [SRC1 SRC2 ...] 
+    exit 2
+fi
+
+NAME=$1
+TARGET=/tmp/$NAME
+shift
+mkdir -pv $TARGET
+
+for SRC in $@ ; do
+    if [ -d "$SRC" ] ; then
+        if echo $SRC | grep -qE '^/' ; then
+            D=$(dirname $SRC)
+            D=${TARGET}${D}
+            mkdir -pv $D 
+            cp -av $SRC ${D}/
+        fi
+        find $SRC -type f -executable | while read F ; do
+            $0 $NAME $F
+        done 
+        find $SRC -name '*.so' | while read F ; do
+            $0 $NAME $F
+        done
+        continue
+    fi
+    for L in $SRC $(ldd $SRC | sed -r 's/\(.+\)$//' | awk '/\//{print $NF}') ; do
+        R=$(realpath $L)
+        if [ "$R" = "$L" ] ; then
+            unset R
+        fi
+        if [ -n "$R" ] ; then
+            mkdir -p ${TARGET}/$(dirname $R)
+            cp -av $R ${TARGET}/$(dirname $R)/
+            mkdir -p ${TARGET}/$(dirname $L)
+            ln -sfv $R ${TARGET}/$L
+        else
+            mkdir -p ${TARGET}/$(dirname $L)
+            cp -av $L ${TARGET}/$(dirname $L)/
+        fi
+    done
+done
+
