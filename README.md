@@ -3,8 +3,8 @@ Create chroot jail using ldd.
 
 ```
 $ ./ldd_jail 
-ldd_jail LABEL SRC [SRC1 SRC2 ...]
+ldd_jail JAIL SRC [SRC1 SRC2 ...]
 ```
 
-Copy all the `SRC` files/directories and their dependencies detected by ldd in `/tmp/LABEL`.
+Copy all the `SRC` files/directories and their dependencies detected by ldd in `/tmp/JAIL`.
 
