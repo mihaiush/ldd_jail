@@ -20,7 +20,7 @@ for SRC in $@ ; do
             D=$(dirname $SRC)
             D=${TARGET}${D}
             mkdir -pv $D 
-            cp -av $SRC ${D}/
+            cp -anv $SRC ${D}/
         fi
         find $SRC -type f -executable | while read F ; do
             $0 $NAME $F
@@ -30,19 +30,20 @@ for SRC in $@ ; do
         done
         continue
     fi
+    echo " --- $SRC"
     for L in $SRC $(ldd $SRC | sed -r 's/\(.+\)$//' | awk '/\//{print $NF}') ; do
         R=$(realpath $L)
         if [ "$R" = "$L" ] ; then
             unset R
         fi
         if [ -n "$R" ] ; then
-            mkdir -p ${TARGET}/$(dirname $R)
-            cp -av $R ${TARGET}/$(dirname $R)/
-            mkdir -p ${TARGET}/$(dirname $L)
-            ln -sfv $R ${TARGET}/$L
+            mkdir -pv ${TARGET}/$(dirname $R)
+            cp -anv $R ${TARGET}/$(dirname $R)/
+            mkdir -pv ${TARGET}/$(dirname $L)
+            ln -sv $R ${TARGET}/$L 2>/dev/null
         else
             mkdir -p ${TARGET}/$(dirname $L)
-            cp -av $L ${TARGET}/$(dirname $L)/
+            cp -anv $L ${TARGET}/$(dirname $L)/
         fi
     done
 done
