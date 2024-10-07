@@ -5,8 +5,19 @@ if [ -z "$2" ] ; then
     exit 2
 fi
 
+if cp -n 2>&1 | grep -qE 'is non-portable|invalid option'; then
+    CPN='--update=none'
+else
+    CPN='-n'
+fi
+CP="cp -av $CPN"
+
 NAME=$1
-TARGET=/tmp/$NAME
+if echo $NAME | grep -q '/' ; then
+    TARGET=$NAME
+else
+    TARGET=/tmp/$NAME
+fi
 shift
 mkdir -pv $TARGET
 
@@ -20,7 +31,7 @@ for SRC in $@ ; do
             D=$(dirname $SRC)
             D=${TARGET}${D}
             mkdir -pv $D 
-            cp -anv $SRC ${D}/
+            $CP $SRC ${D}/
         fi
         find $SRC -type f -executable | while read F ; do
             $0 $NAME $F
@@ -38,12 +49,12 @@ for SRC in $@ ; do
         fi
         if [ -n "$R" ] ; then
             mkdir -pv ${TARGET}/$(dirname $R)
-            cp -anv $R ${TARGET}/$(dirname $R)/
+            $CP $R ${TARGET}/$(dirname $R)/
             mkdir -pv ${TARGET}/$(dirname $L)
             ln -sv $R ${TARGET}/$L 2>/dev/null
         else
             mkdir -p ${TARGET}/$(dirname $L)
-            cp -anv $L ${TARGET}/$(dirname $L)/
+            $CP $L ${TARGET}/$(dirname $L)/
         fi
     done
 done
