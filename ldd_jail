@@ -51,7 +51,7 @@ for SRC in $@ ; do
             mkdir -pv ${TARGET}/$(dirname $R)
             $CP $R ${TARGET}/$(dirname $R)/
             mkdir -pv ${TARGET}/$(dirname $L)
-            ln -sv $R ${TARGET}/$L 2>/dev/null
+            ln -svf $R ${TARGET}/$L 2>/dev/null
         else
             mkdir -p ${TARGET}/$(dirname $L)
             $CP $L ${TARGET}/$(dirname $L)/
